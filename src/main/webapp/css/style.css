@@ -1,0 +1,106 @@
+/* 全局重置 */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+    background: #f5f7fa; /* B站浅灰背景 */
+    color: #222;
+    line-height: 1.6;
+}
+.container {
+    width: 90%;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 30px 20px;
+}
+h1 {
+    text-align: center;
+    margin: 40px 0;
+    font-size: 3rem;
+    color: #00a1d6; /* B站蓝 */
+}
+
+/* 导航栏 - B站风格（白色背景 + 粉蓝高亮） */
+.nav {
+    text-align: center;
+    margin: 40px 0;
+    padding: 15px;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+}
+.nav a {
+    display: inline-block;
+    margin: 0 12px;
+    padding: 12px 32px;
+    background: #f0f0f0;
+    color: #666;
+    text-decoration: none;
+    border-radius: 30px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+.nav a:hover, .nav a.active {
+    background: linear-gradient(90deg, #00beff, #fb7299); /* B站粉蓝渐变 */
+    color: #fff !important;
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(251,114,153,0.3);
+}
+
+/* 视频网格 */
+.video-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 30px;
+}
+.video-item {
+    background: #ffffff;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+    transition: all 0.4s ease;
+}
+.video-item:hover {
+    transform: translateY(-12px);
+    box-shadow: 0 20px 40px rgba(0,174,239,0.2);
+}
+.video-item img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+}
+.video-item:hover img {
+    transform: scale(1.1);
+}
+.video-item p {
+    padding: 18px;
+    text-align: center;
+    font-size: 1.2rem;
+    color: #333;
+    background: #fafafa;
+}
+
+/* 播放页面 */
+video, iframe {
+    width: 100%;
+    max-width: 1100px;
+    min-height: 600px;
+    margin: 30px auto;
+    display: block;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    background: #fff;
+}
+.container > a {
+    display: inline-block;
+    margin: 20px 0;
+    color: #00a1d6;
+    font-size: 1.2rem;
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+    .video-grid { grid-template-columns: 1fr; }
+    .nav a { padding: 10px 20px; margin: 8px; }
+    h1 { font-size: 2.4rem; }
+}
