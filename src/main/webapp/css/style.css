@@ -104,3 +104,51 @@ video, iframe {
     .nav a { padding: 10px 20px; margin: 8px; }
     h1 { font-size: 2.4rem; }
 }
+
+/* 播放页面专用样式 */
+.play-container {
+    width: 90%;
+    max-width: 1000px;
+    margin: 30px auto;
+    position: relative;
+}
+
+.play-container video {
+    width: 100%;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    background: #000;
+}
+
+/* 广告提示信息 */
+.ad-info {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: rgba(0,0,0,0.6);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 14px;
+    z-index: 10;
+}
+
+/* 跳过广告按钮 */
+.skip-btn {
+    position: absolute;
+    bottom: 80px;
+    right: 20px;
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    z-index: 10;
+    display: none;
+}
+
+.skip-btn:hover {
+    background: #0056b3;
+}

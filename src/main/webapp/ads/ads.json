@@ -1,0 +1,32 @@
+{
+  "digital": {
+    "adUrl": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    "position": "start",
+    "duration": 15
+  },
+  "edu": {
+    "adUrl": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+    "position": "middle",
+    "duration": 10
+  },
+  "tech": {
+    "adUrl": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+    "position": "end",
+    "duration": 20
+  },
+  "sport": {
+    "adUrl": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackOnStreetAndDirt.mp4",
+    "position": "start",
+    "duration": 12
+  },
+  "life": {
+    "adUrl": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/VolkswagenGTIReview.mp4",
+    "position": "middle",
+    "duration": 18
+  },
+  "default": {
+    "adUrl": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    "position": "start",
+    "duration": 10
+  }
+}
