@@ -1,6 +1,6 @@
 /**
- * play.js - 终极修复版
- * 包含：自动抓取URL、强制超时跳转、拖动拦截
+ * play.js - 广告防拖拽增强版
+ * 核心逻辑：全局监听事件，根据当前视频源区分逻辑
  */
 document.addEventListener('DOMContentLoaded', function () {
     const config = window.mkConfig || {};
@@ -8,27 +8,25 @@ document.addEventListener('DOMContentLoaded', function () {
     const adInfo = document.getElementById('adInfo');
     const skipBtn = document.getElementById('skipBtn');
 
-    // 【修复1】如果 config 里没取到 url，尝试从 DOM 自动获取，防止 undefined
+    // 自动抓取正片 URL
     let mainUrl = config.videoUrl;
     if (!mainUrl || mainUrl.trim() === "") {
         const sourceTag = player.querySelector('source');
         if (sourceTag) mainUrl = sourceTag.src;
     }
-    console.log("正片地址:", mainUrl);
 
     const recommendNumId = config.recommendNumId || 2;
     const adServerUrl = "http://10.100.164.13:8080/api/ads/randomByPrefix";
     const trackApiUrl = config.contextPath + "/api/track";
     const categoryId = config.categoryId;
 
+    // 状态变量
     let adData = null;
     let adPlayed = false;
-    let lastTime = 0;
-    let resumeTime = 0;
-    let targetSeekTime = null;
-
-    // 定时器变量
-    let adForceTimer = null; // 【新增】强制结束定时器
+    let lastTime = 0;          // 实时记录播放时间 (用于回弹)
+    let resumeTime = 0;        // 冻结的正片时间 (用于恢复)
+    let targetSeekTime = null; // 拖动拦截的目标时间
+    let adForceTimer = null;
     let skipTimer = null;
 
     // 1. 请求广告
@@ -49,63 +47,83 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 if (adData.adUrl) {
                     console.log(`广告就绪，将在第 ${adData.insertAt} 秒插入`);
-                    initAdListener();
+                    // 启动全局监听
+                    initGlobalListeners();
                 }
             }
         })
         .catch(e => console.error("广告请求失败", e));
 
-    function initAdListener() {
-        player.addEventListener('timeupdate', handleTimeUpdate);
-        player.addEventListener('seeking', handleSeeking);
+    // ==========================================
+    // 核心逻辑：永久监听器 (不再反复移除/添加)
+    // ==========================================
+    function initGlobalListeners() {
+        player.addEventListener('timeupdate', handleGlobalTimeUpdate);
+        player.addEventListener('seeking', handleGlobalSeeking);
     }
 
-    function handleTimeUpdate() {
-        if (player.src.includes(adData.adUrl)) return;
-
-        // 触发广告
-        if (!adPlayed && Math.abs(player.currentTime - adData.insertAt) < 0.5) {
-            console.log("正常触发广告");
-            resumeTime = player.currentTime;
-            playAd();
-            return;
-        }
-
+    // 全局时间更新处理
+    function handleGlobalTimeUpdate() {
+        // 1. 始终更新 lastTime (除非正在拖动)
+        // 这是实现“防拖拽回弹”的关键，记录上一秒在哪
         if (!player.seeking) {
             lastTime = player.currentTime;
         }
-    }
 
-    function handleSeeking() {
-        if (adPlayed || player.src.includes(adData.adUrl)) return;
+        // 2. 如果是广告模式，不执行触发逻辑
+        if (isAdPlaying()) return;
 
-        const currentTime = player.currentTime;
-        const insertAt = adData.insertAt;
-
-        if (lastTime < insertAt && currentTime > insertAt) {
-            console.log("拦截拖动！");
-            targetSeekTime = currentTime;
+        // 3. 正片模式：检查是否触发广告
+        if (!adPlayed && Math.abs(player.currentTime - adData.insertAt) < 0.5) {
+            console.log("触发广告播放");
+            resumeTime = player.currentTime; // 冻结正片进度
             playAd();
         }
     }
 
+    // 全局拖动处理
+    function handleGlobalSeeking() {
+        // 1. 【新增】广告模式：禁止拖拽！
+        if (isAdPlaying()) {
+            // 如果拖动幅度超过 1秒，强制弹回
+            const delta = Math.abs(player.currentTime - lastTime);
+            if (delta > 1) {
+                console.warn("广告期间禁止拖动！自动回弹。");
+                player.currentTime = lastTime; // 弹回上一刻的位置
+            }
+            return;
+        }
+
+        // 2. 正片模式：防跨越广告拖拽
+        const currentTime = player.currentTime;
+        const insertAt = adData.insertAt;
+
+        if (!adPlayed && lastTime < insertAt && currentTime > insertAt) {
+            console.log("检测到跨越广告拖动，拦截！");
+            targetSeekTime = currentTime; // 记住用户想去哪
+            playAd(); // 强制进广告
+        }
+    }
+
+    // 辅助：判断当前是否在播广告
+    function isAdPlaying() {
+        return adData && player.src.includes(adData.adUrl);
+    }
+
+    // ==========================================
+    // 播放控制
+    // ==========================================
     function playAd() {
         adPlayed = true;
 
-        // 移除监听
-        player.removeEventListener('timeupdate', handleTimeUpdate);
-        player.removeEventListener('seeking', handleSeeking);
-
-        // 播放广告
+        // 切换视频源
         player.src = adData.adUrl;
         showAdUI();
-        player.play().catch(e => console.error("广告自动播放失败:", e));
+        player.play().catch(e => console.error("广告自动播放被拦截:", e));
 
-        // 监听结束
         player.onended = switchToMain;
 
-        // 【修复2】增加“强制超时”机制
-        // 万一 onended 没触发，(广告时长 + 1秒) 后强制切回
+        // 强制超时保护
         clearTimeout(adForceTimer);
         adForceTimer = setTimeout(() => {
             console.warn("广告超时强制切回");
@@ -123,39 +141,26 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function switchToMain() {
-        console.log("正在切回正片...");
-
-        // 清理现场
+        console.log("切回正片...");
         hideAdUI();
         clearTimeout(skipTimer);
-        clearTimeout(adForceTimer); // 清除强制定时器
-        player.onended = null;      // 移除结束监听
+        clearTimeout(adForceTimer);
+        player.onended = null;
 
-        // 检查 mainUrl 是否有效
-        if (!mainUrl) {
-            alert("正片地址丢失，请刷新页面");
-            return;
-        }
+        if (!mainUrl) { alert("正片地址丢失"); return; }
 
         player.src = mainUrl;
 
-        // 决定恢复到哪里
+        // 计算恢复点
         const seekTo = (targetSeekTime !== null) ? targetSeekTime : (resumeTime + 0.1);
-        console.log("目标时间:", seekTo);
 
         // 恢复播放函数
         const resumePlay = () => {
+            console.log("跳回进度:", seekTo);
             player.currentTime = seekTo;
-            player.play().catch(e => console.error(e));
+            targetSeekTime = null; // 清理
 
-            // 重新挂载监听
-            player.addEventListener('timeupdate', function() {
-                if (!player.seeking && !player.src.includes(adData.adUrl)) {
-                    lastTime = player.currentTime;
-                }
-            });
-            // 如果希望下次还能拦截拖动，可以解除注释下面这行
-            // player.addEventListener('seeking', handleSeeking);
+            player.play().catch(e => console.error(e));
         };
 
         // 等待元数据加载
@@ -176,7 +181,7 @@ document.addEventListener('DOMContentLoaded', function () {
         skipBtn.style.display = 'none';
     }
 
-    // 埋点保持不变
+    // 埋点
     let startWatchTime = Date.now();
     window.addEventListener('beforeunload', function () {
         const endTime = Date.now();
