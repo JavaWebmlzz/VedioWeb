@@ -1,154 +1,312 @@
-/* 全局重置 */
+/* ================= 全局重置 ================= */
+:root {
+    --bili-blue: #00AEEC;
+    --bili-pink: #FB7299;
+    --bg-gray: #F4F5F7;
+    --text-dark: #212121;
+    --text-gray: #9499A0;
+    --card-radius: 6px;
+}
+
 * { margin: 0; padding: 0; box-sizing: border-box; }
+
 body {
-    font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
-    background: #f5f7fa; /* B站浅灰背景 */
-    color: #222;
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    background: var(--bg-gray);
+    color: var(--text-dark);
     line-height: 1.6;
 }
+
+a { text-decoration: none; color: inherit; transition: color 0.2s; }
+ul { list-style: none; }
+
+/* 容器通用样式 */
 .container {
-    width: 90%;
-    max-width: 1400px;
+    width: 100%;
+    max-width: 1600px; /* B站是大屏适配 */
     margin: 0 auto;
-    padding: 30px 20px;
-}
-h1 {
-    text-align: center;
-    margin: 40px 0;
-    font-size: 3rem;
-    color: #00a1d6; /* B站蓝 */
+    padding: 0 20px;
 }
 
-/* 导航栏 - B站风格（白色背景 + 粉蓝高亮） */
-.nav {
-    text-align: center;
-    margin: 40px 0;
-    padding: 15px;
-    background: #ffffff;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+/* ================= 头部样式 (Header) ================= */
+/* 模拟 B站顶部导航条 */
+.site-header {
+    background: #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+    margin-bottom: 20px;
+    padding: 10px 0;
 }
-.nav a {
-    display: inline-block;
-    margin: 0 12px;
-    padding: 12px 32px;
-    background: #f0f0f0;
-    color: #666;
-    text-decoration: none;
-    border-radius: 30px;
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 50px;
+}
+
+.logo {
+    font-size: 24px;
     font-weight: bold;
-    transition: all 0.3s ease;
-}
-.nav a:hover, .nav a.active {
-    background: linear-gradient(90deg, #00beff, #fb7299); /* B站粉蓝渐变 */
-    color: #fff !important;
-    transform: translateY(-4px);
-    box-shadow: 0 8px 20px rgba(251,114,153,0.3);
+    color: var(--bili-blue);
+    display: flex;
+    align-items: center;
 }
 
-/* 视频网格 */
+.logo i { margin-right: 8px; font-size: 28px; } /* 如果有图标 */
+
+.user-panel {
+    font-size: 14px;
+    color: var(--text-dark);
+}
+
+.user-panel a {
+    margin-left: 15px;
+    color: var(--text-dark);
+}
+
+.user-panel a:hover { color: var(--bili-blue); }
+
+.user-panel .btn-primary {
+    background: var(--bili-blue);
+    color: white;
+    padding: 6px 16px;
+    border-radius: 4px;
+}
+.user-panel .btn-primary:hover { background: #00A1D6; color: white; }
+
+/* ================= 导航栏 (Nav) ================= */
+.nav-wrapper {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center; /* 居中显示 */
+}
+
+.nav {
+    display: inline-flex;
+    background: transparent;
+    padding: 0;
+    box-shadow: none;
+}
+
+.nav a {
+    display: block;
+    margin: 0 8px;
+    padding: 8px 16px;
+    font-size: 16px;
+    color: var(--text-dark);
+    border-radius: 4px;
+    background: transparent;
+    transition: all 0.2s;
+}
+
+.nav a:hover {
+    color: var(--bili-blue);
+    background-color: #fff;
+}
+
+.nav a.active {
+    color: var(--bili-blue);
+    font-weight: bold;
+    border-bottom: 3px solid var(--bili-blue);
+    border-radius: 0;
+}
+
+/* ================= 视频网格 (Video Grid) ================= */
 .video-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 30px;
+    grid-template-columns: repeat(5, 1fr); /* B站默认5列 */
+    gap: 20px;
+    padding-bottom: 40px;
 }
+
+/* 响应式列数 */
+@media (max-width: 1400px) { .video-grid { grid-template-columns: repeat(4, 1fr); } }
+@media (max-width: 1100px) { .video-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 768px) { .video-grid { grid-template-columns: repeat(2, 1fr); } }
+
 .video-item {
-    background: #ffffff;
-    border-radius: 16px;
-    overflow: hidden;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.1);
-    transition: all 0.4s ease;
-}
-.video-item:hover {
-    transform: translateY(-12px);
-    box-shadow: 0 20px 40px rgba(0,174,239,0.2);
-}
-.video-item img {
-    width: 100%;
-    height: 200px;
-    object-fit: cover;
-    transition: transform 0.4s ease;
-}
-.video-item:hover img {
-    transform: scale(1.1);
-}
-.video-item p {
-    padding: 18px;
-    text-align: center;
-    font-size: 1.2rem;
-    color: #333;
-    background: #fafafa;
-}
-
-/* 播放页面 */
-video, iframe {
-    width: 100%;
-    max-width: 1100px;
-    min-height: 600px;
-    margin: 30px auto;
-    display: block;
-    border-radius: 16px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
     background: #fff;
-}
-.container > a {
-    display: inline-block;
-    margin: 20px 0;
-    color: #00a1d6;
-    font-size: 1.2rem;
+    border-radius: var(--card-radius);
+    overflow: hidden;
+    transition: box-shadow 0.2s, transform 0.2s;
+    cursor: pointer;
 }
 
-/* 响应式 */
-@media (max-width: 768px) {
-    .video-grid { grid-template-columns: 1fr; }
-    .nav a { padding: 10px 20px; margin: 8px; }
-    h1 { font-size: 2.4rem; }
+.video-item:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    transform: translateY(-4px);
 }
 
-/* 播放页面专用样式 */
-.play-container {
-    width: 90%;
-    max-width: 1000px;
-    margin: 30px auto;
+.video-card-cover {
     position: relative;
-}
-
-.play-container video {
     width: 100%;
-    border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-    background: #000;
+    padding-top: 56.25%; /* 16:9 比例 */
+    overflow: hidden;
+    border-radius: var(--card-radius) var(--card-radius) 0 0;
 }
 
-/* 广告提示信息 */
-.ad-info {
+.video-card-cover img {
     position: absolute;
-    top: 10px;
-    left: 10px;
-    background: rgba(0,0,0,0.6);
-    color: white;
-    padding: 5px 10px;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.video-info {
+    padding: 10px 12px;
+}
+
+.video-title {
+    font-size: 15px;
+    color: #18191C;
+    line-height: 22px;
+    height: 44px; /* 限制两行高度 */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    margin-bottom: 6px;
+}
+
+.video-item:hover .video-title { color: var(--bili-blue); }
+
+/* ================= 登录/注册页面 (Login Box) ================= */
+/* 这里的样式之前在 JSP 里，现在移过来了 */
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh;
+    background: url('../images/login-bg.png') no-repeat center bottom; /* 可以加个插画背景 */
+    background-size: contain;
+}
+
+.login-box {
+    width: 400px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    padding: 40px 30px;
+    border-radius: 8px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.login-header h2 {
+    font-size: 24px;
+    color: var(--bili-blue);
+    margin-bottom: 30px;
+}
+
+.form-group { margin-bottom: 20px; text-align: left; }
+
+.form-input {
+    width: 100%;
+    height: 44px;
+    padding: 0 14px;
+    border: 1px solid #ddd;
     border-radius: 4px;
+    outline: none;
     font-size: 14px;
-    z-index: 10;
+    transition: border 0.2s;
 }
 
-/* 跳过广告按钮 */
-.skip-btn {
-    position: absolute;
-    bottom: 80px;
-    right: 20px;
-    background: #007bff;
+.form-input:focus { border-color: var(--bili-blue); }
+
+.btn-submit {
+    width: 100%;
+    height: 44px;
+    background: var(--bili-blue);
     color: white;
     border: none;
-    padding: 10px 20px;
     border-radius: 4px;
+    font-size: 16px;
     cursor: pointer;
-    font-size: 14px;
-    z-index: 10;
-    display: none;
+    margin-top: 10px;
+    transition: background 0.2s;
+}
+.btn-submit:hover { background: #00A1D6; }
+
+.btn-register-link {
+    background: #fff;
+    color: var(--bili-blue);
+    border: 1px solid var(--bili-blue);
+    margin-top: 15px;
+}
+.btn-register-link:hover { background: #f1f8ff; }
+
+.auth-links { margin-top: 20px; font-size: 13px; color: var(--text-gray); }
+.auth-links a { color: var(--bili-blue); }
+
+.error-msg {
+    color: #F25D8E;
+    font-size: 12px;
+    margin-bottom: 10px;
+    background: #FFECF1;
+    padding: 8px;
+    border-radius: 4px;
+    text-align: left;
 }
 
-.skip-btn:hover {
-    background: #0056b3;
+/* ================= 播放页面 (Play) ================= */
+.play-page-container {
+    max-width: 1200px;
+    margin: 20px auto;
 }
+
+.video-header h1 {
+    text-align: left;
+    font-size: 20px;
+    font-weight: 500;
+    color: #18191C;
+    margin: 0 0 20px 0;
+}
+
+.play-wrapper {
+    width: 100%;
+    background: #000;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    border-radius: 4px; /* B站播放器圆角很小 */
+    overflow: hidden;
+    position: relative;
+    /* 保持16:9比例容器技巧 */
+    /* aspect-ratio: 16 / 9; */
+}
+
+.play-wrapper video {
+    display: block;
+    width: 100%;
+    max-height: 70vh; /* 限制最大高度 */
+    margin: 0 auto;
+}
+
+.ad-info {
+    position: absolute;
+    top: 20px; left: 20px;
+    background: rgba(0,0,0,0.7);
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 13px;
+    z-index: 100;
+}
+
+.skip-btn {
+    position: absolute;
+    bottom: 60px; right: 20px;
+    background: rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.4);
+    color: #fff;
+    padding: 8px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 14px;
+    z-index: 100;
+    backdrop-filter: blur(4px);
+    display: none;
+    transition: background 0.2s;
+}
+
+.skip-btn:hover { background: var(--bili-blue); border-color: var(--bili-blue); }

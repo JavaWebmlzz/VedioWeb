@@ -1,9 +1,10 @@
 package com.example.videoweb.servlet;
 
 import com.example.videoweb.dao.VideoDao;
+import com.example.videoweb.entity.User;
 import com.example.videoweb.entity.Video;
-import jakarta.servlet.*;
-import jakarta.servlet.annotation.*;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.IOException;
 
@@ -16,30 +17,37 @@ public class PlayServlet extends HttpServlet {
             throws ServletException, IOException {
         String idStr = req.getParameter("id");
         if (idStr != null) {
-            int id = Integer.parseInt(idStr);
-            Video video = dao.getVideoById(id);
+            try {
+                int id = Integer.parseInt(idStr);
+                Video video = dao.getVideoById(id);
 
-            if (video != null) {
-                // 1. 设置基本视频信息
-                req.setAttribute("video", video);
-                req.setAttribute("categoryId", video.getCategoryId());
+                if (video != null) {
+                    // 1. 设置视频基本信息
+                    req.setAttribute("video", video);
+                    req.setAttribute("categoryId", video.getCategoryId());
 
-                // ---------------- 核心推荐逻辑开始 ----------------
-                // 2. 获取用户唯一标识 (这里用 SessionID 作为示例，无需登录也能用)
-                String userIdentifier = req.getSession().getId();
+                    // ================= 推荐算法逻辑 =================
 
-                // 3. 获取当前视频的数字ID
-                int currentNumId = dao.getNumIdByStrId(video.getCategoryId());
+                    // 2. 识别用户身份 (登录用户用 USER_ID，游客用 SessionID)
+                    HttpSession session = req.getSession();
+                    User user = (User) session.getAttribute("user");
+                    String userIdentifier = (user != null) ? "USER_" + user.getId() : session.getId();
 
-                // 4. 写入数据库：点击次数+1
-                dao.incrementClickCount(userIdentifier, currentNumId);
+                    // 3. 调用 DAO 的推荐算法，获取 num_id
+                    // (算法：根据点击次数和时长计算权重，新用户默认返回 1-教育)
+                    int recommendNumId = dao.getBestCategoryNumId(userIdentifier);
 
-                // 5. 从数据库查：当前最感兴趣的 num_id
-                int recommendNumId = dao.getBestCategoryNumId(userIdentifier);
+                    // 4. 将推荐结果传给 JSP，用于请求广告
+                    req.setAttribute("recommendNumId", recommendNumId);
 
-                // 6. 放入 request 作用域，供 JSP 直接使用 EL 表达式读取
-                req.setAttribute("recommendNumId", recommendNumId);
-                // ---------------- 核心推荐逻辑结束 ----------------
+                    // Debug 日志 (方便你在服务器后台看效果)
+                    System.out.println("用户 " + userIdentifier + " 进入播放页，推荐广告分类ID: " + recommendNumId);
+
+                    // ===============================================
+                }
+            } catch (NumberFormatException e) {
+                // 防止 id 不是数字导致的报错
+                e.printStackTrace();
             }
         }
         req.getRequestDispatcher("/play.jsp").forward(req, resp);

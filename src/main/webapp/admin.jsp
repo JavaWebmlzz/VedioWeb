@@ -4,7 +4,7 @@
 <html lang="zh">
 <head>
     <meta charset="UTF-8">
-    <title>后台管理 - 极简视频网</title>
+    <title>后台管理 - MK视频</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
     <style>
         form { background:white; padding:20px; border-radius:8px; margin:20px 0; box-shadow:0 2px 10px rgba(0,0,0,0.1); }
@@ -31,7 +31,10 @@
     </c:if>
 
     <h2>添加新视频</h2>
-    <form method="post">
+    <!-- admin.jsp -->
+
+    <!-- 1. 修改 form 标签，加上 enctype -->
+    <form method="post" enctype="multipart/form-data">
         <input type="hidden" name="action" value="add">
 
         <label>标题：</label>
@@ -44,14 +47,17 @@
             </c:forEach>
         </select>
 
-        <label>视频 URL（B站页面、直链mp4等）：</label>
-        <input type="text" name="videoUrl" placeholder="https://www.bilibili.com/video/BV..." required style="width:100%;padding:10px;margin:10px 0;">
+        <!-- 2. 修改视频输入框为文件上传 -->
+        <label>上传视频文件：</label>
+        <input type="file" name="videoFile" required style="margin:10px 0;">
 
-        <label>封面图（本地文件名或网络URL）：</label>
-        <input type="text" name="thumb" placeholder="7.jpg 或 https://img.example.com/cover.jpg" required style="width:100%;padding:10px;margin:10px 0;">
+        <!-- 3. 修改封面输入框为文件上传 -->
+        <label>上传封面图片：</label>
+        <input type="file" name="imageFile" required style="margin:10px 0;">
 
         <button type="submit">添加视频</button>
     </form>
+
 
     <h2>已有视频（共 ${videos.size()} 个）</h2>
     <table>

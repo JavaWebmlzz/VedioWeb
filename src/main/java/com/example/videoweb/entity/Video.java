@@ -19,5 +19,11 @@ public class Video {
     public String getTitle() { return title; }
     public String getCategoryId() { return categoryId; }
     public String getVideoUrl() { return url; }  // 直接返回数据库存的 URL
-    public String getThumb() { return thumb.startsWith("http") ? thumb : "/images/" + thumb; }
+    public String getThumb() { // 如果是 http 开头（网络图），或者 / 开头（已经是完整路径了），直接返回
+        if (thumb != null && (thumb.startsWith("http") || thumb.startsWith("/"))) {
+            return thumb;
+        }
+        // 否则才拼接 /images/
+        return "/images/" + thumb;
+    }
 }

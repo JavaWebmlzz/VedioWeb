@@ -4,36 +4,63 @@
 <html lang="zh">
 <head>
     <meta charset="UTF-8">
-    <title>极简视频网 - ${currentCat == 'digital' ? '数码' :
-            currentCat == 'edu' ? '教育' :
-                    currentCat == 'tech' ? '科技' :
-                            currentCat == 'sport' ? '运动' : '生活'}</title>
+    <title>MK视频 - ${
+            currentCat == 'tech' ? '科技' :
+                    currentCat == 'edu' ? '教育' :
+                            currentCat == 'sport' ? '体育' :
+                                    currentCat == 'entertainment' ? '娱乐' : '首页'
+            }</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
 </head>
 <body>
-<div class="container">
-    <h1>极简视频网</h1>
 
-    <!-- 分类导航栏 -->
-    <div class="nav">
-        <c:forEach items="${categories}" var="c">
-            <a href="?cat=${c.id}"
-               class="${currentCat == c.id ? 'active' : ''}">${c.name}</a>
-        </c:forEach>
+<header class="site-header">
+    <div class="container header-content">
+        <a href="${pageContext.request.contextPath}/" class="logo">MK视频</a>
+
+        <div class="user-panel">
+            <c:choose>
+                <c:when test="${not empty sessionScope.user}">
+                    <span>${sessionScope.user.username}</span>
+                    <a href="${pageContext.request.contextPath}/user?action=logout">退出</a>
+                </c:when>
+                <c:otherwise>
+                    <a href="${pageContext.request.contextPath}/login.jsp" class="btn-primary">登录</a>
+                    <a href="${pageContext.request.contextPath}/register.jsp">注册</a>
+                </c:otherwise>
+            </c:choose>
+        </div>
+    </div>
+</header>
+
+<div class="container">
+    <div class="nav-wrapper">
+        <nav class="nav">
+            <c:forEach items="${categories}" var="c">
+                <a href="?cat=${c.id}" class="${currentCat == c.id ? 'active' : ''}">${c.name}</a>
+            </c:forEach>
+        </nav>
     </div>
 
-    <!-- 视频列表 -->
     <div class="video-grid">
         <c:forEach items="${videos}" var="v">
             <div class="video-item">
                 <a href="${pageContext.request.contextPath}/play?id=${v.id}">
-                    <img src="${pageContext.request.contextPath}${v.thumb}"
-                         alt="${v.title}" onerror="this.src='${pageContext.request.contextPath}/images/default.png'">
-                    <p>${v.title}</p>
+                    <div class="video-card-cover">
+                        <!-- 移除了 onerror，交给 global.js 处理 -->
+                        <img src="${v.thumb}" alt="${v.title}">
+                    </div>
+                    <div class="video-info">
+                        <p class="video-title">${v.title}</p>
+                    </div>
                 </a>
             </div>
         </c:forEach>
     </div>
 </div>
+
+<!-- 引入全局 JS 处理图片错误 -->
+<script src="${pageContext.request.contextPath}/js/global.js"></script>
+
 </body>
 </html>

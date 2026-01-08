@@ -16,7 +16,7 @@ public class HomeServlet extends HttpServlet {
         String cat = req.getParameter("cat");
         req.setAttribute("categories", dao.getAllCategories());
         req.setAttribute("videos", dao.getVideosByCategory(cat));
-        req.setAttribute("currentCat", cat == null ? "digital" : cat);
+        req.setAttribute("currentCat", cat == null ? "edu" : cat);
         req.getRequestDispatcher("/index.jsp").forward(req, resp);
     }
 }
