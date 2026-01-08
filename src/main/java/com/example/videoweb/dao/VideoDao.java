@@ -117,4 +117,54 @@ public class VideoDao {
             ps.executeUpdate();
         }
     }
+
+    // 在 VideoDao 类中添加以下方法
+
+    // 增加点击次数
+    public void incrementClickCount(String userIdentifier, int categoryNumId) {
+        // 使用 "INSERT ... ON DUPLICATE KEY UPDATE" 语句
+        // 如果记录不存在就插入1，如果存在就+1
+        String sql = "INSERT INTO user_interest (user_identifier, category_num_id, click_count) " +
+                "VALUES (?, ?, 1) " +
+                "ON DUPLICATE KEY UPDATE click_count = click_count + 1";
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, userIdentifier);
+            ps.setInt(2, categoryNumId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // 获取用户最感兴趣的 num_id
+    public int getBestCategoryNumId(String userIdentifier) {
+        // 查点击次数最多的那个 num_id
+        String sql = "SELECT category_num_id FROM user_interest " +
+                "WHERE user_identifier = ? " +
+                "ORDER BY click_count DESC LIMIT 1";
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, userIdentifier);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("category_num_id");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 2; // 默认返回 2 (科技)，以防万一
+    }
+
+    // 辅助：根据字符串ID获取数字ID (这部分逻辑也可以查库，这里为了性能直接写死)
+    public int getNumIdByStrId(String strId) {
+        if ("edu".equals(strId)) return 1;
+        if ("tech".equals(strId)) return 2;
+        if ("sport".equals(strId)) return 3;
+        if ("entertainment".equals(strId)) return 4;
+        return 2;
+    }
+
 }
+

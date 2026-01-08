@@ -12,6 +12,9 @@ public class AdServlet extends HttpServlet {
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
 
+
+        String ctx = req.getContextPath();
+
         String cat = req.getParameter("cat");
         if (cat == null || cat.isEmpty()) {
             cat = "default";
@@ -21,7 +24,7 @@ public class AdServlet extends HttpServlet {
 
         switch (cat) {
             case "digital":
-                adJson = "{\"adUrl\":\"/VideoWeb_war_exploded/videos/ad/test-ad.mp4\","
+                adJson = "{\"adUrl\":\""+ ctx +"/videos/ad/test-ad.mp4\","
                         + "\"position\":\"middle\","
                         + "\"duration\":7,"
                         + "\"insertAt\":3}";
